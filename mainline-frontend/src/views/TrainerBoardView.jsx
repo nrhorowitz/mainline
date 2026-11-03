@@ -7,6 +7,7 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloseIcon from '@mui/icons-material/Close';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -276,6 +277,9 @@ export function TrainerBoardView(props) {
     const [modalOpeningKey, setModalOpeningKey] = useState('');
     const [modalLineKey, setModalLineKey] = useState('');
 
+    // Repertoire Moves Modal state
+    const [isMovesModalOpen, setIsMovesModalOpen] = useState(false);
+
     const openOptionsModal = () => {
         setModalColorChoice(colorChoice);
         setModalOpeningKey(activeOpeningKey || '');
@@ -310,13 +314,14 @@ export function TrainerBoardView(props) {
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Escape' && isOptionsOpen) {
-                setIsOptionsOpen(false);
+            if (e.key === 'Escape') {
+                if (isOptionsOpen) setIsOptionsOpen(false);
+                if (isMovesModalOpen) setIsMovesModalOpen(false);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOptionsOpen]);
+    }, [isOptionsOpen, isMovesModalOpen]);
 
     // Reset current line
     const handleRestartLine = () => {
@@ -503,46 +508,207 @@ export function TrainerBoardView(props) {
 
     return (
         <div className="catalog-view-container trainer-page-wrap">
-            {/* Top Navigation Bar with Back Arrow to /trainer */}
-            <div className="catalog-header-bar trainer-nav-bar">
+            {/* Ultra-compact Header Bar */}
+            <div className="trainer-header-compact">
                 <Link to="/trainer" className="catalog-back-link">
-                    <IconButton size="small" sx={{ color: '#BABABA', padding: '6px' }}>
-                        <ArrowBackIcon sx={{ fontSize: 22 }} />
+                    <IconButton size="small" sx={{ color: '#BABABA', padding: '4px' }}>
+                        <ArrowBackIcon sx={{ fontSize: 20 }} />
                     </IconButton>
                 </Link>
-                <div className="catalog-header-title-box">
-                    <div className="catalog-header-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {activeOpening ? activeOpening.opening_name : 'Opening Trainer'}
+
+                <div className="trainer-compact-info">
+                    <div className="trainer-compact-name-row">
+                        <span className="trainer-compact-op-title">
+                            {activeOpening ? activeOpening.opening_name : 'Trainer'}
+                        </span>
+                        {activeLine?.label && (
+                            <span className="trainer-compact-tag-green">{activeLine.label}</span>
+                        )}
+                        <span className="trainer-compact-tag-blue">
+                            {activeLine?.getDeviationMove ? activeLine.getDeviationMove() : (activeLine?.line_name || 'Mainline')}
+                        </span>
                     </div>
-                    <div className="catalog-header-subtitle">
-                        {activeLine ? (activeLine.label || activeLine.line_name) : 'Interactive Sparring'}
+                    <div className="trainer-compact-sub-row">
+                        <span className="trainer-compact-side-badge">
+                            {assignedSide === 'white' ? '⚪ You: White' : '⚫ You: Black'}
+                        </span>
+                        <span className="trainer-compact-move-counter">
+                            Move {Math.min(currentMoveNumber, totalMoves)}/{totalMoves}
+                        </span>
+                        {streak > 0 && (
+                            <span className="trainer-compact-streak-badge">
+                                🔥 {streak}
+                            </span>
+                        )}
                     </div>
                 </div>
-                <div className="trainer-nav-stats">
-                    <span className="trainer-stat-pill" title="Completed variations">
-                        <EmojiEventsIcon sx={{ fontSize: 16, color: '#F0D9B5' }} />
-                        <span>{completedCount}</span>
-                    </span>
-                    <span className="trainer-stat-pill" title="Consecutive correct moves">
-                        <span style={{ fontSize: '13px' }}>🔥</span>
-                        <span>{streak}</span>
-                    </span>
+
+                <div className="trainer-compact-header-actions">
+                    <IconButton
+                        size="small"
+                        onClick={handleToggleOrientation}
+                        title="Flip Board"
+                        sx={{ color: '#BABABA', padding: '5px' }}
+                    >
+                        <SwapVertIcon sx={{ fontSize: 19 }} />
+                    </IconButton>
                     <IconButton
                         size="small"
                         onClick={openOptionsModal}
                         title="Trainer Settings"
-                        sx={{
-                            color: '#BABABA',
-                            backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                            padding: '6px',
-                            marginLeft: '2px',
-                            '&:hover': { backgroundColor: 'rgba(35, 181, 239, 0.2)', color: trainerIconColor }
-                        }}
+                        sx={{ color: '#BABABA', padding: '5px' }}
                     >
-                        <SettingsIcon sx={{ fontSize: 20 }} />
+                        <SettingsIcon sx={{ fontSize: 19 }} />
                     </IconButton>
                 </div>
             </div>
+
+            {/* 2px Slim Progress Line Flush Under Header */}
+            <div className="trainer-progress-slim-track">
+                <div
+                    className="trainer-progress-slim-fill"
+                    style={{
+                        width: `${progressPercent}%`,
+                        backgroundColor: status === 'completed' ? '#00AC8D' : trainerIconColor
+                    }}
+                />
+            </div>
+
+            {/* Compact Turn & Feedback Status Bar */}
+            <div className={`trainer-status-slim ${feedback.type} ${status === 'wrong' ? 'shake-anim' : ''}`}>
+                <div className="trainer-status-slim-left">
+                    {feedback.type === 'thinking' && <span className="trainer-thinking-dot-slim" />}
+                    {feedback.type === 'info' && <span className="trainer-turn-dot-slim" />}
+                    {feedback.type === 'success' && <CheckCircleOutlineIcon sx={{ fontSize: 15, color: '#00AC8D' }} />}
+                    {feedback.type === 'error' && <ErrorOutlineIcon sx={{ fontSize: 15, color: '#FF5252' }} />}
+                    <span className="trainer-status-slim-msg">{feedback.message}</span>
+                </div>
+                {hintText && (
+                    <span className="trainer-status-slim-hint-badge">{hintText}</span>
+                )}
+            </div>
+
+            {/* Stockfish Engine Evaluation Bar */}
+            <BoardEvaluation evaluation={currentEvaluation} />
+
+            {/* The Interactive Chess Board */}
+            {currentBoard && (
+                <div className="trainer-board-wrapper">
+                    <Board
+                        ref={boardRef}
+                        orientation={orientation}
+                        board={currentBoard}
+                        isCurrentBoard={isPlayerTurn && status !== 'completed'}
+                        boardTurn={playerTurnColor}
+                        currentBoardNotation={currentNotation}
+                        submitMoveCallback={handlePlayerMove}
+                    />
+                </div>
+            )}
+
+            {/* Compact Action Controls Bar */}
+            <div className="trainer-actions-compact">
+                <button
+                    className="trainer-compact-action-btn"
+                    onClick={handleShowHint}
+                    disabled={status === 'completed' || !isPlayerTurn}
+                    title="Get a hint"
+                >
+                    <LightbulbIcon sx={{ fontSize: 16 }} />
+                    <span>Hint</span>
+                </button>
+
+                <button
+                    className="trainer-compact-action-btn"
+                    onClick={handleRestartLine}
+                    title="Restart line"
+                >
+                    <ReplayIcon sx={{ fontSize: 16 }} />
+                    <span>Retry</span>
+                </button>
+
+                <button
+                    className="trainer-compact-action-btn"
+                    onClick={() => setIsMovesModalOpen(true)}
+                    title="View all line moves"
+                >
+                    <MenuBookIcon sx={{ fontSize: 16 }} />
+                    <span>Moves</span>
+                </button>
+
+                <button
+                    className="trainer-compact-action-btn next-primary"
+                    onClick={handleNextLine}
+                    style={{ backgroundColor: trainerIconColor, color: iconSecondaryColor }}
+                    title="Practice next variation"
+                >
+                    <SkipNextIcon sx={{ fontSize: 18 }} />
+                    <span>Next</span>
+                </button>
+            </div>
+
+            {/* Repertoire Moves Modal */}
+            {isMovesModalOpen && (
+                <div className="trainer-modal-overlay" onClick={() => setIsMovesModalOpen(false)}>
+                    <div className="trainer-modal-card trainer-moves-modal-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="trainer-modal-header">
+                            <div className="trainer-modal-title">
+                                <MenuBookIcon sx={{ fontSize: 20, color: trainerIconColor }} />
+                                <span>Repertoire Moves</span>
+                            </div>
+                            <IconButton
+                                size="small"
+                                onClick={() => setIsMovesModalOpen(false)}
+                                sx={{ color: '#BABABA', padding: '4px' }}
+                            >
+                                <CloseIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                        </div>
+
+                        <div className="trainer-modal-body" style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                                <span className="trainer-compact-op-title" style={{ fontSize: '13px' }}>
+                                    {activeOpening ? activeOpening.opening_name : ''}
+                                </span>
+                                {activeLine?.label && (
+                                    <span className="trainer-tag-green">{activeLine.label}</span>
+                                )}
+                                <span className="trainer-tag-blue">
+                                    {activeLine?.getDeviationMove ? activeLine.getDeviationMove() : activeLine?.line_name}
+                                </span>
+                            </div>
+                            <div className="trainer-history-moves-list" style={{ lineHeight: '1.8' }}>
+                                {notationStack.map((notObj, idx) => {
+                                    const moveNum = Math.floor(idx / 2) + 1;
+                                    const isWhiteMove = (idx % 2 === 0);
+                                    const isPast = idx < currentPly;
+                                    const isCurrent = idx === currentPly;
+                                    return (
+                                        <span
+                                            key={idx}
+                                            className={`trainer-history-move ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''}`}
+                                        >
+                                            {isWhiteMove && <span className="trainer-history-number">{moveNum}.</span>}
+                                            {notObj.moveNotation}
+                                        </span>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="trainer-modal-footer">
+                            <button
+                                type="button"
+                                className="trainer-modal-save-btn"
+                                style={{ width: '100%' }}
+                                onClick={() => setIsMovesModalOpen(false)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Trainer Options Modal */}
             {isOptionsOpen && (
@@ -643,145 +809,6 @@ export function TrainerBoardView(props) {
                                 Save Options
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Board Title Header */}
-            {activeOpening && activeLine && (
-                <div className="trainer-line-header-card">
-                    <div className="trainer-line-title-row">
-                        <div className="trainer-line-info">
-                            <span className="trainer-line-opening-name">{activeOpening.opening_name}</span>
-                            <div className="trainer-tag-row">
-                                {activeLine.label && (
-                                    <span className="trainer-tag-green">{activeLine.label}</span>
-                                )}
-                                <span className="trainer-tag-blue">
-                                    {activeLine.getDeviationMove ? activeLine.getDeviationMove() : activeLine.line_name}
-                                </span>
-                                <span className="trainer-playing-as-badge">
-                                    Playing {assignedSide === 'white' ? '⚪ White' : '⚫ Black'}
-                                </span>
-                            </div>
-                        </div>
-                        <IconButton
-                            size="small"
-                            onClick={handleToggleOrientation}
-                            title="Flip Board"
-                            sx={{ color: '#BABABA', background: 'rgba(255,255,255,0.05)', padding: '6px' }}
-                        >
-                            <SwapVertIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="trainer-progress-container">
-                        <div className="trainer-progress-labels">
-                            <span>Move {Math.min(currentMoveNumber, totalMoves)} of {totalMoves}</span>
-                            <span>{progressPercent}% Complete</span>
-                        </div>
-                        <div className="trainer-progress-track">
-                            <div
-                                className="trainer-progress-fill"
-                                style={{
-                                    width: `${progressPercent}%`,
-                                    backgroundColor: status === 'completed' ? '#00AC8D' : trainerIconColor
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Dynamic Status / Feedback Alert */}
-            <div className={`trainer-feedback-card ${feedback.type} ${status === 'wrong' ? 'shake-anim' : ''}`}>
-                <div className="trainer-feedback-icon">
-                    {feedback.type === 'success' && <CheckCircleOutlineIcon sx={{ fontSize: 20, color: '#00AC8D' }} />}
-                    {feedback.type === 'error' && <ErrorOutlineIcon sx={{ fontSize: 20, color: '#FF5252' }} />}
-                    {feedback.type === 'thinking' && <span className="trainer-thinking-dot" />}
-                    {feedback.type === 'info' && <span className="trainer-turn-dot" />}
-                </div>
-                <div className="trainer-feedback-text">{feedback.message}</div>
-            </div>
-
-            {/* Hint Banner (if requested) */}
-            {hintText && (
-                <div className="trainer-hint-banner">
-                    {hintText}
-                </div>
-            )}
-
-            {/* Stockfish Engine Evaluation Bar */}
-            <BoardEvaluation evaluation={currentEvaluation} />
-
-            {/* The Interactive Chess Board */}
-            {currentBoard && (
-                <div className="trainer-board-wrapper">
-                    <Board
-                        ref={boardRef}
-                        orientation={orientation}
-                        board={currentBoard}
-                        isCurrentBoard={isPlayerTurn && status !== 'completed'}
-                        boardTurn={playerTurnColor}
-                        currentBoardNotation={currentNotation}
-                        submitMoveCallback={handlePlayerMove}
-                    />
-                </div>
-            )}
-
-            {/* Trainer Action Controls */}
-            <div className="trainer-actions-bar">
-                <button
-                    className="trainer-action-btn hint-btn"
-                    onClick={handleShowHint}
-                    disabled={status === 'completed' || !isPlayerTurn}
-                    title="Get a hint for the next move"
-                >
-                    <LightbulbIcon sx={{ fontSize: 18 }} />
-                    <span>Hint</span>
-                </button>
-
-                <button
-                    className="trainer-action-btn restart-btn"
-                    onClick={handleRestartLine}
-                    title="Restart this line from move 1"
-                >
-                    <ReplayIcon sx={{ fontSize: 18 }} />
-                    <span>Retry</span>
-                </button>
-
-                <button
-                    className="trainer-action-btn next-btn"
-                    onClick={handleNextLine}
-                    style={{ backgroundColor: trainerIconColor, color: iconSecondaryColor }}
-                    title="Practice next variation"
-                >
-                    <SkipNextIcon sx={{ fontSize: 20 }} />
-                    <span>Next Line</span>
-                </button>
-            </div>
-
-            {/* Compact Move History Strip */}
-            {notationStack.length > 0 && (
-                <div className="trainer-history-card">
-                    <div className="trainer-history-title">REPERTOIRE MOVES</div>
-                    <div className="trainer-history-moves-list">
-                        {notationStack.map((notObj, idx) => {
-                            const moveNum = Math.floor(idx / 2) + 1;
-                            const isWhiteMove = (idx % 2 === 0);
-                            const isPast = idx < currentPly;
-                            const isCurrent = idx === currentPly;
-                            return (
-                                <span
-                                    key={idx}
-                                    className={`trainer-history-move ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''}`}
-                                >
-                                    {isWhiteMove && <span className="trainer-history-number">{moveNum}.</span>}
-                                    {notObj.moveNotation}
-                                </span>
-                            );
-                        })}
                     </div>
                 </div>
             )}

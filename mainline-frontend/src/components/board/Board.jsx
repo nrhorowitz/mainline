@@ -26,10 +26,45 @@ for (let i = 0; i < pieceEnums.length; i += 1) {
 }
 
 function Square(props) {
+    const squareIndex = computeSelected(props.row, props.col);
+    const isPlayer = props.isCurrentBoard && isPlayerPiece(props.piece, props.boardTurn);
+
     const onClick = (e) => {
         console.log('Clicked: ', props.row, props.col);
-        props.setSelectedCallback(computeSelected(props.row, props.col));
+        props.setSelectedCallback(squareIndex);
     }
+
+    const onDragStart = (e) => {
+        if (!isPlayer) return;
+        e.dataTransfer.setData('text/plain', String(squareIndex));
+        e.dataTransfer.effectAllowed = 'move';
+        props.setSelectedCallback(squareIndex);
+    };
+
+    const onDragOver = (e) => {
+        if (props.isCurrentBoard) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+    };
+
+    const onDrop = (e) => {
+        if (!props.isCurrentBoard) return;
+        e.preventDefault();
+        const sourceStr = e.dataTransfer.getData('text/plain');
+        if (sourceStr) {
+            const sourceSquare = parseInt(sourceStr, 10);
+            if (!isNaN(sourceSquare)) {
+                props.onPieceDrop(sourceSquare, squareIndex);
+            }
+        }
+    };
+
+    const onTouchStart = (e) => {
+        if (!isPlayer) return;
+        props.onTouchDragStart(squareIndex, e);
+    };
+
     const className = ((props.row % 2 === 0) ^ (props.col % 2 === 0)) ? "board-square even" : "board-square odd";
     const currentNumberMap = (props.orientation === BoardOrientation.DEFAULT) ? numberMap : numberMapReversed;
     const currentLetterMap = (props.orientation === BoardOrientation.DEFAULT) ? letterMap : letterMapReversed;
@@ -45,7 +80,15 @@ function Square(props) {
     }
     let piece;
     if (props.piece !== Piece.DEFAULT) {
-        piece = <img src={pieceMap[props.piece]} className="board-piece" />;
+        piece = (
+            <img
+                src={pieceMap[props.piece]}
+                className="board-piece"
+                draggable={isPlayer}
+                onDragStart={onDragStart}
+                alt=""
+            />
+        );
     }
     let selected;
     if (isSelected(props.selected, props.row, props.col)) {
@@ -56,14 +99,25 @@ function Square(props) {
         previousMove = <div className="board-square-selected previous" />
     }
     let validMove;
-    if (props.validMoves.has(computeSelected(props.row, props.col))) {
+    if (props.validMoves.has(squareIndex)) {
         if (props.piece === Piece.DEFAULT) {
             validMove = <div className="board-square-selected empty" />
         } else {
             validMove = <div className="board-square-selected piece" />
         }
     }
-    return <div className={className} onClick={onClick}>{coordinateRank}{coordinateFile}{selected}{previousMove}{validMove}{piece}</div>;
+    return (
+        <div
+            className={className}
+            data-square={squareIndex}
+            onClick={onClick}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            onTouchStart={onTouchStart}
+        >
+            {coordinateRank}{coordinateFile}{selected}{previousMove}{validMove}{piece}
+        </div>
+    );
 }
 
 function Row(props) {
@@ -77,12 +131,17 @@ function Row(props) {
             setSelectedCallback={props.setSelectedCallback}
             selected={props.selected}
             validMoves={props.validMoves}
-            previousMoves={props.previousMoves} />)}
+            previousMoves={props.previousMoves}
+            isCurrentBoard={props.isCurrentBoard}
+            boardTurn={props.boardTurn}
+            onPieceDrop={props.onPieceDrop}
+            onTouchDragStart={props.onTouchDragStart} />)}
     </div>;
 }
 
 export const Board = forwardRef((props, ref) => {
     const [selected, setSelected] = useState(-1);
+    const touchDragRef = useRef(null);
 
     useImperativeHandle(ref, () => ({
         reset() {
@@ -124,6 +183,62 @@ export const Board = forwardRef((props, ref) => {
         }
     }
 
+    const handlePieceDrop = (fromSquare, toSquare) => {
+        if (!props.isCurrentBoard) return;
+        const fromPiece = getPiece(boardData, fromSquare);
+        if (!isPlayerPiece(fromPiece, props.boardTurn)) return;
+
+        const moves = getValidMoves(boardData, fromSquare, props.boardTurn, props.orientation, props.additionalValidMoves);
+        if (moves.has(toSquare)) {
+            props.submitMoveCallback(fromSquare, toSquare);
+            setSelected(-1);
+        } else {
+            const toPiece = getPiece(boardData, toSquare);
+            if (isPlayerPiece(toPiece, props.boardTurn)) {
+                setSelected(toSquare);
+            } else {
+                setSelected(-1);
+            }
+        }
+    };
+
+    const onTouchDragStart = (square, e) => {
+        if (!props.isCurrentBoard) return;
+        const t = e.touches[0];
+        touchDragRef.current = {
+            square,
+            startX: t.clientX,
+            startY: t.clientY,
+            hasMoved: false
+        };
+        setSelected(square);
+    };
+
+    const handleTouchMove = (e) => {
+        if (!touchDragRef.current) return;
+        const t = e.touches[0];
+        const dist = Math.hypot(t.clientX - touchDragRef.current.startX, t.clientY - touchDragRef.current.startY);
+        if (dist > 8) {
+            touchDragRef.current.hasMoved = true;
+        }
+    };
+
+    const handleTouchEnd = (e) => {
+        if (!touchDragRef.current) return;
+        if (touchDragRef.current.hasMoved) {
+            const t = e.changedTouches[0];
+            const targetEl = document.elementFromPoint(t.clientX, t.clientY);
+            const squareEl = targetEl ? targetEl.closest('.board-square') : null;
+            if (squareEl) {
+                const targetSquare = parseInt(squareEl.getAttribute('data-square'), 10);
+                if (!isNaN(targetSquare) && targetSquare !== touchDragRef.current.square) {
+                    handlePieceDrop(touchDragRef.current.square, targetSquare);
+                }
+            }
+        }
+        touchDragRef.current = null;
+    };
+
     const previousMoves = [];
     if (props.currentBoardNotation !== null && props.currentBoardNotation !== undefined) {
         const destRow = numberMapComplement[String(props.currentBoardNotation.rankDestination)];
@@ -146,15 +261,27 @@ export const Board = forwardRef((props, ref) => {
         }
     }
 
-    return <div className="board">
-        {[...Array(8)].map((e, i) => <Row 
-            key={i}
-            row={i}
-            orientation={props.orientation}
-            boardRow={boardData[i]}
-            setSelectedCallback={setSelectedCallback}
-            selected={selected}
-            validMoves={validMoves}
-            previousMoves={previousMoves} />)}
-    </div>;
+    return (
+        <div
+            className="board"
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={() => { touchDragRef.current = null; }}
+        >
+            {[...Array(8)].map((e, i) => <Row 
+                key={i}
+                row={i}
+                orientation={props.orientation}
+                boardRow={boardData[i]}
+                setSelectedCallback={setSelectedCallback}
+                selected={selected}
+                validMoves={validMoves}
+                previousMoves={previousMoves}
+                isCurrentBoard={props.isCurrentBoard}
+                boardTurn={props.boardTurn}
+                onPieceDrop={handlePieceDrop}
+                onTouchDragStart={onTouchDragStart}
+            />)}
+        </div>
+    );
 });
