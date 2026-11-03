@@ -64,6 +64,7 @@ def generate_opening_line(
     output_filename: str = None,
     seed_moves_san: list = None,
     label: str = None,
+    deviation: str = None,
 ) -> dict:
     """
     Generate an opening repertoire structure using Lichess cloud evaluations.
@@ -180,6 +181,8 @@ def generate_opening_line(
                 new_line_entry = {"name": line_name, "moves": continuation_items}
                 if label:
                     new_line_entry["label"] = label
+                if deviation:
+                    new_line_entry["deviation"] = deviation
                 if line_idx >= 0:
                     lines_list[line_idx] = new_line_entry
                 else:
@@ -192,6 +195,8 @@ def generate_opening_line(
         first_line = {"name": line_name, "moves": continuation_items}
         if label:
             first_line["label"] = label
+        if deviation:
+            first_line["deviation"] = deviation
         repertoire_data = {
             "opening": opening_name,
             "moves": root_items,
@@ -249,6 +254,12 @@ def main():
         help="Optional human-readable name of variation (e.g. 'Rossolimo', 'Open', 'Closed'). Stored in separate 'label' field.",
     )
     parser.add_argument(
+        "--deviation",
+        type=str,
+        default=None,
+        help="Optional explicit first deviating move string (e.g. '2...Nc6', '5...g6').",
+    )
+    parser.add_argument(
         "--output",
         type=str,
         default=None,
@@ -268,6 +279,7 @@ def main():
         output_filename=args.output,
         seed_moves_san=seed_moves_list,
         label=args.label,
+        deviation=args.deviation,
     )
 
 

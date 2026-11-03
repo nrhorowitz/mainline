@@ -88,6 +88,10 @@ python3 services/engine/generate_line.py --opening Sicilian --root "e4 c5" --see
 
 # Or using the root npm alias:
 npm run generate:line -- --opening Sicilian --root "e4 c5" --seed "Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3" --line mainline --moves 18
+
+# Generate all canonical openings & variations in batch:
+npm run generate:all
+# or: python3 services/engine/generate_all_openings.py
 ```
 
 ### Command Line Arguments
@@ -100,6 +104,7 @@ npm run generate:line -- --opening Sicilian --root "e4 c5" --seed "Nf3 d6 d4 cxd
 | `--moves` | `int` | `18` | Number of full moves (~36 individual plies). |
 | `--line` | `str` | `mainline` | Sub-variation key/name (e.g. `mainline`, `2...Nc6`, `4...dxc4`). Replaces or appends to existing variations. |
 | `--label` | `str` | `None` | Optional separate variation name (e.g. `Rossolimo`, `Open`, `Closed`). Displayed as a **green tag** in UI. |
+| `--deviation` | `str` | `None` | Optional explicit first deviating move string (e.g. `2...Nc6`, `5...g6`). Displayed as a **blue tag** in UI. |
 | `--output` | `str` | `None` | Custom output filename (defaults to `{opening_name.lower()}.json`). |
 
 ---
