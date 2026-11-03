@@ -14,7 +14,7 @@ var allLines = loadAllLines();
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <LandingView />,
+        element: <LandingView allLines={allLines} />,
     },
     {
         path: "/study",

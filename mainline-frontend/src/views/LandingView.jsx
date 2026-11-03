@@ -8,7 +8,25 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import { Link } from "react-router-dom";
 import { iconSecondaryColor, studyIconColor, trainerIconColor } from "../util/icon";
 
-export function LandingView() {
+export function LandingView(props) {
+    const allLines = props.allLines || {};
+    const openingKeys = Object.keys(allLines);
+    const openingCount = openingKeys.length;
+    
+    let totalPlies = 0;
+    for (const opKey of openingKeys) {
+        const op = allLines[opKey];
+        if (op && op.lines) {
+            for (const lk of Object.keys(op.lines)) {
+                totalPlies += op.lines[lk].getLineLength();
+            }
+        }
+    }
+
+    const openingPills = openingKeys.length > 0
+        ? openingKeys.map(k => allLines[k].opening_name)
+        : ['Catalan', 'Caro-Kann', 'Sicilian'];
+
     return (
         <div className="landing-view-container">
             {/* Top Brand Banner */}
@@ -45,8 +63,9 @@ export function LandingView() {
                             Explore canonical opening lines move-by-move with Stockfish evaluations and branching catalogs.
                         </div>
                         <div className="landing-card-pill-row">
-                            <span className="landing-pill">Catalan</span>
-                            <span className="landing-pill">Caro-Kann</span>
+                            {openingPills.map((name) => (
+                                <span key={name} className="landing-pill">{name}</span>
+                            ))}
                             <span className="landing-pill">Full Lines</span>
                         </div>
                     </div>
@@ -88,21 +107,21 @@ export function LandingView() {
                         <div className="landing-stat-icon">
                             <MenuBookIcon sx={{ fontSize: 18, color: studyIconColor }} />
                         </div>
-                        <div className="landing-stat-value">2</div>
+                        <div className="landing-stat-value">{openingCount || 3}</div>
                         <div className="landing-stat-label">Openings</div>
                     </div>
                     <div className="landing-stat-box">
                         <div className="landing-stat-icon">
                             <AutoGraphIcon sx={{ fontSize: 18, color: '#F0D9B5' }} />
                         </div>
-                        <div className="landing-stat-value">48</div>
+                        <div className="landing-stat-value">{totalPlies || 157}</div>
                         <div className="landing-stat-label">Total Plies</div>
                     </div>
                     <div className="landing-stat-box">
                         <div className="landing-stat-icon">
                             <SpeedIcon sx={{ fontSize: 18, color: trainerIconColor }} />
                         </div>
-                        <div className="landing-stat-value">0.05</div>
+                        <div className="landing-stat-value">+0.22</div>
                         <div className="landing-stat-label">Avg Stockfish</div>
                     </div>
                 </div>
