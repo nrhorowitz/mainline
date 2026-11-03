@@ -84,10 +84,10 @@ You can run the script directly with Python or via npm:
 
 ```bash
 # Using Python directly:
-python3 services/engine/generate_line.py --opening Sicilian --root "e4 c5" --moves 18
+python3 services/engine/generate_line.py --opening Sicilian --root "e4 c5" --seed "Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3" --line mainline --moves 18
 
 # Or using the root npm alias:
-npm run generate:line -- --opening Sicilian --root "e4 c5" --moves 18
+npm run generate:line -- --opening Sicilian --root "e4 c5" --seed "Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3" --line mainline --moves 18
 ```
 
 ### Command Line Arguments
@@ -96,8 +96,9 @@ npm run generate:line -- --opening Sicilian --root "e4 c5" --moves 18
 | :--- | :--- | :--- | :--- |
 | `--opening` | `str` | `Sicilian` | Display name of the opening (e.g., `Sicilian`, `RuyLopez`, `French`). |
 | `--root` | `str` | `e4 c5` | Space-separated root moves in SAN notation (e.g., `e4 c5` or `d4 Nf6 c4`). |
+| `--seed` | `str` | `""` | Optional initial moves to seed the variation line before Lichess engine continuation (e.g. `Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3`). |
 | `--moves` | `int` | `18` | Number of full moves (~36 individual plies). |
-| `--line` | `str` | `mainline` | Sub-variation name (default is `mainline`). |
+| `--line` | `str` | `mainline` | Sub-variation name (default is `mainline`). Replaces or appends to existing variations. |
 | `--output` | `str` | `None` | Custom output filename (defaults to `{opening_name.lower()}.json`). |
 
 ---
@@ -109,7 +110,7 @@ Generated files are placed in `mainline-frontend/src/data/`:
 mainline-frontend/src/data/sicilian.json
 ```
 
-Example output format:
+Example output format (Sicilian Mainline - Najdorf English Attack):
 ```json
 {
   "opening": "Sicilian",
@@ -121,13 +122,32 @@ Example output format:
     {
       "name": "mainline",
       "moves": [
+        { "m": "Nf3", "e": 0.20 },
+        { "m": "d6", "e": 0.31 },
+        { "m": "d4", "e": 0.22 },
+        { "m": "cxd4", "e": 0.19 },
+        { "m": "Nxd4", "e": 0.18 },
+        { "m": "Nf6", "e": 0.31 },
+        { "m": "Nc3", "e": 0.32 },
+        { "m": "a6", "e": 0.32 },
+        { "m": "Be3", "e": 0.25 },
+        ...
+        { "m": "Rad1", "e": 0.05 },
+        { "m": "Re8", "e": 0.00 }
+      ]
+    },
+    {
+      "name": "rossolimo",
+      "moves": [
         { "m": "Nf3", "e": 0.32 },
         { "m": "Nc6", "e": 0.20 },
         { "m": "Bb5", "e": 0.30 },
         ...
-        { "m": "Bf5", "e": 0.12 }
       ]
     }
+  ]
+}
+```
   ]
 }
 ```
@@ -150,3 +170,4 @@ To make newly generated datasets available in the app:
    }
    ```
 4. The opening will immediately appear in the **Study Repertoire Catalog** and the **Trainer Selector**.
+
