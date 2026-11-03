@@ -30,7 +30,8 @@ Each opening file adheres to the following JSON structure:
   ],
   "lines": [
     {
-      "name": "LineVariationName",
+      "name": "LineVariationKey",
+      "label": "HumanReadableName",
       "moves": [
         { "m": "MoveInSAN", "e": 0.00 }
       ]
@@ -43,10 +44,12 @@ Each opening file adheres to the following JSON structure:
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `opening` | `string` | Display name of the opening (e.g., `"Catalan"`, `"CaroKann"`). |
+| `opening` | `string` | Display name of the opening (e.g., `"Catalan"`, `"CaroKann"`, `"Sicilian"`). |
 | `moves` | `Array<Move>` | Base move sequence that defines the root opening before branching into specific lines. |
 | `lines` | `Array<Line>` | Array of specific sub-variations branching off the base moves. |
-| `line.name` | `string` | Name of the variation (e.g., `"mainline"`, `"open"`, `"advance"`). |
+| `line.name` | `string` | Identifier/key for the variation (e.g., `"mainline"`, `"2...Nc6"`, `"4...dxc4"`). Used for URL routing. |
+| `line.label` | `string` *(optional)* | Separate human-readable name of the variation (e.g., `"Rossolimo"`, `"Open"`, `"Closed"`, `"Advance"`). Displayed as a **green tag** in the UI. |
+| `line.deviation` | `string` *(optional)* | First move that deviates from the mainline. If omitted, computed automatically against the mainline. Displayed as a **blue tag** in the UI. |
 | `line.moves` | `Array<Move>` | Additional move sequence continuing from the end of root `moves`. |
 | `move.m` | `string` | Move string in Standard Algebraic Notation (SAN), e.g. `"Nf6"`, `"cxd5"`, `"Bb4+"`, `"O-O"`. |
 | `move.e` | `number` | Position evaluation in pawn units after this move (positive for White advantage, negative for Black advantage). |

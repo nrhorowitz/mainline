@@ -20,7 +20,14 @@ export function BoardTitle(props) {
             <div className="board-title-content">
                 <span className="board-title-opening">{props.openingName}</span>
                 <span className="board-title-separator">•</span>
-                <span className="board-title-line-badge">{formattedLineName}</span>
+                {props.greenTag && (
+                    <span className="catalog-tag-green" style={{ fontSize: '11px', padding: '1px 6px' }}>
+                        {props.greenTag}
+                    </span>
+                )}
+                <span className="catalog-tag-blue" style={{ fontSize: '11px', padding: '1px 6px' }}>
+                    {props.blueTag || formattedLineName}
+                </span>
             </div>
 
             {props.onToggleOrientation && (

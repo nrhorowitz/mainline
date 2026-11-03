@@ -12,7 +12,7 @@ export function StudyViewBoard(props) {
     const { path_opening, path_line } = useParams();
     const opening = props.allLines[path_opening];
     const openingIndex = opening.opening_moves.length;
-    const line = opening.lines[path_line];
+    const line = (opening.getLine ? opening.getLine(path_line) : opening.lines[path_line]) || opening.lines[path_line];
 
     const [boardOrientation, setBoardOrientation] = useState(BoardOrientation.DEFAULT);
     const [solutionBoardIndex, setSolutionBoardIndex] = useState(openingIndex);
@@ -72,6 +72,8 @@ export function StudyViewBoard(props) {
             <BoardTitle
                 openingName={opening.opening_name}
                 lineName={line.line_name}
+                greenTag={line.label}
+                blueTag={line.getDeviationMove ? line.getDeviationMove() : line.line_name}
                 pathOpening={path_opening}
                 pathLine={path_line}
                 onToggleOrientation={toggleOrientation}

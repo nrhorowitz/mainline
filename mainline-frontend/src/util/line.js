@@ -280,9 +280,11 @@ function applyMove(board, notation, boardTurn) {
 }
 
 export class OpeningLine {
-    constructor(line_data, line_name) {
+    constructor(line_data, line_name, label=null, deviation=null) {
         this.line_data = line_data;
         this.line_name = line_name;
+        this.label = label;
+        this.deviation = deviation;
     }
 
     getBoardNotationStack() {
@@ -310,6 +312,14 @@ export class OpeningLine {
     getLineLength() {
         return this.line_data.length;
     }
+
+    getLabel() {
+        return this.label;
+    }
+
+    getDeviationMove() {
+        return this.deviation || (this.line_name === 'mainline' ? 'Mainline' : this.line_name);
+    }
 }
 
 export class Opening {
@@ -317,9 +327,48 @@ export class Opening {
       this.opening_name = opening_data.opening;
       this.opening_moves = opening_data.moves;
       this.lines = {};
+      
+      // Determine mainline moves to calculate first deviating move
+      let mainlineMoves = null;
+      for (let i = 0; i < opening_data.lines.length; i += 1) {
+        if (opening_data.lines[i].name === 'mainline') {
+          mainlineMoves = opening_data.moves.concat(opening_data.lines[i].moves);
+          break;
+        }
+      }
+      if (!mainlineMoves && opening_data.lines.length > 0) {
+        mainlineMoves = opening_data.moves.concat(opening_data.lines[0].moves);
+      }
+
       for (let i = 0; i < opening_data.lines.length; i += 1) {
         let line = opening_data.lines[i];
-        this.lines[line.name] = new OpeningLine(opening_data.moves.concat(line.moves), line.name);
+        let fullLineData = opening_data.moves.concat(line.moves);
+        let label = line.label || line.variation || line.title || null;
+        let deviation = line.deviation || (line.name && line.name.includes('.') ? line.name : null);
+
+        // If deviation not explicitly given, compute first deviating move from mainline
+        if (!deviation) {
+          if (line.name === 'mainline') {
+            deviation = 'Mainline';
+          } else if (mainlineMoves) {
+            for (let p = 0; p < fullLineData.length; p += 1) {
+              let lMove = fullLineData[p].m;
+              let mMove = mainlineMoves[p] ? mainlineMoves[p].m : null;
+              if (lMove !== mMove) {
+                let moveNum = Math.floor(p / 2) + 1;
+                let isBlack = (p % 2 === 1);
+                deviation = isBlack ? `${moveNum}...${lMove}` : `${moveNum}. ${lMove}`;
+                break;
+              }
+            }
+          }
+        }
+        if (!deviation) {
+          deviation = line.name;
+        }
+
+        let openingLine = new OpeningLine(fullLineData, line.name, label, deviation);
+        this.lines[line.name] = openingLine;
       }
     }
 
@@ -328,7 +377,18 @@ export class Opening {
     }
 
     getLine(line_name) {
-        return this.lines[line_name];
+        if (!line_name) return null;
+        if (this.lines[line_name]) return this.lines[line_name];
+        const decoded = decodeURIComponent(line_name).toLowerCase();
+        if (this.lines[decoded]) return this.lines[decoded];
+        for (const key of Object.keys(this.lines)) {
+            const line = this.lines[key];
+            if (key.toLowerCase() === decoded) return line;
+            if (line.line_name && line.line_name.toLowerCase() === decoded) return line;
+            if (line.label && line.label.toLowerCase() === decoded) return line;
+            if (line.deviation && line.deviation.toLowerCase() === decoded) return line;
+        }
+        return null;
     }
 }
 

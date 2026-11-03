@@ -98,7 +98,8 @@ npm run generate:line -- --opening Sicilian --root "e4 c5" --seed "Nf3 d6 d4 cxd
 | `--root` | `str` | `e4 c5` | Space-separated root moves in SAN notation (e.g., `e4 c5` or `d4 Nf6 c4`). |
 | `--seed` | `str` | `""` | Optional initial moves to seed the variation line before Lichess engine continuation (e.g. `Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3`). |
 | `--moves` | `int` | `18` | Number of full moves (~36 individual plies). |
-| `--line` | `str` | `mainline` | Sub-variation name (default is `mainline`). Replaces or appends to existing variations. |
+| `--line` | `str` | `mainline` | Sub-variation key/name (e.g. `mainline`, `2...Nc6`, `4...dxc4`). Replaces or appends to existing variations. |
+| `--label` | `str` | `None` | Optional separate variation name (e.g. `Rossolimo`, `Open`, `Closed`). Displayed as a **green tag** in UI. |
 | `--output` | `str` | `None` | Custom output filename (defaults to `{opening_name.lower()}.json`). |
 
 ---
@@ -110,7 +111,7 @@ Generated files are placed in `mainline-frontend/src/data/`:
 mainline-frontend/src/data/sicilian.json
 ```
 
-Example output format (Sicilian Mainline - Najdorf English Attack):
+Example output format (Sicilian Mainline + Rossolimo Variation):
 ```json
 {
   "opening": "Sicilian",
@@ -137,7 +138,8 @@ Example output format (Sicilian Mainline - Najdorf English Attack):
       ]
     },
     {
-      "name": "rossolimo",
+      "name": "2...Nc6",
+      "label": "Rossolimo",
       "moves": [
         { "m": "Nf3", "e": 0.32 },
         { "m": "Nc6", "e": 0.20 },

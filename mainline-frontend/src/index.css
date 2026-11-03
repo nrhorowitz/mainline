@@ -690,6 +690,41 @@ code {
   border-radius: 6px;
 }
 
+.catalog-tag-green {
+  background: rgba(0, 172, 141, 0.16);
+  color: #00DDB5;
+  border: 1px solid rgba(0, 172, 141, 0.45);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.catalog-tag-blue {
+  background: rgba(35, 181, 239, 0.16);
+  color: #23B5EF;
+  border: 1px solid rgba(35, 181, 239, 0.45);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.catalog-tags-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .catalog-card-arrow {
   display: flex;
   align-items: center;

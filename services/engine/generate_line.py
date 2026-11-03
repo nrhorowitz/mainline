@@ -63,6 +63,7 @@ def generate_opening_line(
     line_name: str = "mainline",
     output_filename: str = None,
     seed_moves_san: list = None,
+    label: str = None,
 ) -> dict:
     """
     Generate an opening repertoire structure using Lichess cloud evaluations.
@@ -177,6 +178,8 @@ def generate_opening_line(
                 lines_list = repertoire_data.get("lines", [])
                 line_idx = next((i for i, l in enumerate(lines_list) if l.get("name") == line_name), -1)
                 new_line_entry = {"name": line_name, "moves": continuation_items}
+                if label:
+                    new_line_entry["label"] = label
                 if line_idx >= 0:
                     lines_list[line_idx] = new_line_entry
                 else:
@@ -186,15 +189,13 @@ def generate_opening_line(
             print(f"  [Notice] Could not read existing file: {e}")
 
     if not repertoire_data:
+        first_line = {"name": line_name, "moves": continuation_items}
+        if label:
+            first_line["label"] = label
         repertoire_data = {
             "opening": opening_name,
             "moves": root_items,
-            "lines": [
-                {
-                    "name": line_name,
-                    "moves": continuation_items,
-                }
-            ],
+            "lines": [first_line],
         }
 
     with open(output_path, "w", encoding="utf-8") as f:
@@ -239,7 +240,13 @@ def main():
         "--line",
         type=str,
         default="mainline",
-        help="Variation line name. Default is 'mainline'.",
+        help="Variation line name/key (e.g. 'mainline', '2...Nc6', '4...dxc4'). Default is 'mainline'.",
+    )
+    parser.add_argument(
+        "--label",
+        type=str,
+        default=None,
+        help="Optional human-readable name of variation (e.g. 'Rossolimo', 'Open', 'Closed'). Stored in separate 'label' field.",
     )
     parser.add_argument(
         "--output",
@@ -260,6 +267,7 @@ def main():
         line_name=args.line,
         output_filename=args.output,
         seed_moves_san=seed_moves_list,
+        label=args.label,
     )
 
 

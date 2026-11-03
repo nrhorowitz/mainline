@@ -21,6 +21,7 @@
   "lines": [
     {
       "name": "mainline",
+      "label": "Advance",
       "moves": [
         {
           "m": "e5",

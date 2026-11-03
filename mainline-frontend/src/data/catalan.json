@@ -158,6 +158,7 @@
     },
     {
       "name": "4...dxc4",
+      "label": "Open",
       "moves": [
         {
           "m": "dxc4",
@@ -207,6 +208,7 @@
     },
     {
       "name": "4...c6",
+      "label": "Closed",
       "moves": [
         {
           "m": "c6",

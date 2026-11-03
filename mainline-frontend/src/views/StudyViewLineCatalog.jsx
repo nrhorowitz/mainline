@@ -9,6 +9,23 @@ import IconButton from '@mui/material/IconButton';
 import { Link, useParams } from "react-router-dom";
 import { iconSecondaryColor, studyIconColor } from "../util/icon";
 
+function formatLinePreview(movesData, maxPlies = 10) {
+    if (!movesData || movesData.length === 0) return '';
+    let s = '';
+    const sliceCount = Math.min(movesData.length, maxPlies);
+    for (let i = 0; i < sliceCount; i += 1) {
+        let moveSan = movesData[i].m;
+        if (i % 2 === 0) {
+            s += String(Math.floor(i / 2) + 1) + ". ";
+        }
+        s += moveSan + " ";
+    }
+    if (movesData.length > maxPlies) {
+        s += "...";
+    }
+    return s.trim();
+}
+
 export function StudyViewLineCatalog(props) {
     const { path_opening } = useParams();
     const [searchQuery, setSearchQuery] = useState('');
@@ -31,9 +48,13 @@ export function StudyViewLineCatalog(props) {
 
     const lineKeys = Object.keys(opening.lines);
     const filteredLines = lineKeys.filter((lineKey) => {
+        const line = opening.lines[lineKey];
         const query = searchQuery.toLowerCase().trim();
         if (!query) return true;
-        return lineKey.toLowerCase().includes(query);
+        const nameMatch = lineKey.toLowerCase().includes(query);
+        const labelMatch = line && line.label && line.label.toLowerCase().includes(query);
+        const devMatch = line && line.getDeviationMove && line.getDeviationMove().toLowerCase().includes(query);
+        return nameMatch || labelMatch || devMatch;
     });
 
     return (
@@ -85,7 +106,12 @@ export function StudyViewLineCatalog(props) {
                     filteredLines.map((lineKey) => {
                         const line = opening.lines[lineKey];
                         const lineLength = line ? line.getLineLength() : 0;
-                        const formattedName = lineKey.charAt(0).toUpperCase() + lineKey.slice(1);
+                        const greenTag = line ? line.label : null;
+                        const blueTag = line && line.getDeviationMove ? line.getDeviationMove() : lineKey;
+                        const cardTitle = greenTag
+                            ? `${greenTag} Variation`
+                            : (lineKey === 'mainline' ? 'Mainline Variation' : `${blueTag} Variation`);
+
                         return (
                             <Link
                                 key={lineKey}
@@ -94,12 +120,25 @@ export function StudyViewLineCatalog(props) {
                             >
                                 <div className="catalog-card">
                                     <div className="catalog-card-header">
-                                        <div className="catalog-card-title-group">
-                                            <div className="catalog-card-title">{formattedName} Variation</div>
+                                        <div className="catalog-card-title-group" style={{ flexWrap: 'wrap', gap: '8px' }}>
+                                            <div className="catalog-card-title">{cardTitle}</div>
+                                            <div className="catalog-tags-wrap">
+                                                {greenTag && (
+                                                    <span className="catalog-tag-green">{greenTag}</span>
+                                                )}
+                                                <span className="catalog-tag-blue">{blueTag}</span>
+                                            </div>
                                         </div>
                                         <div className="catalog-card-arrow">
                                             <ChevronRightIcon sx={{ fontSize: 22, color: '#777' }} />
                                         </div>
+                                    </div>
+
+                                    {/* Line preview moves box */}
+                                    <div className="catalog-card-moves-box">
+                                        <span className="catalog-card-moves-text">
+                                            {formatLinePreview(line ? line.line_data : [])}
+                                        </span>
                                     </div>
 
                                     <div className="catalog-card-footer" style={{ marginTop: '12px' }}>
