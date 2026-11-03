@@ -7,7 +7,8 @@ import { LandingView } from './LandingView';
 import { StudyViewBoard } from './StudyViewBoard';
 import { StudyViewCatalog } from './StudyViewCatalog';
 import { StudyViewLineCatalog } from './StudyViewLineCatalog';
-import { TrainerView } from './TrainerView';
+import { TrainerCatalogView } from './TrainerCatalogView';
+import { TrainerBoardView } from './TrainerBoardView';
 
 var allLines = loadAllLines();
 
@@ -30,15 +31,15 @@ const router = createBrowserRouter([
     },
     {
         path: "/trainer",
-        element: <TrainerView allLines={allLines} />,
+        element: <TrainerCatalogView allLines={allLines} />,
     },
     {
-        path: "/trainer/:path_opening",
-        element: <TrainerView allLines={allLines} />,
+        path: "/trainer/:id",
+        element: <TrainerBoardView allLines={allLines} />,
     },
     {
-        path: "/trainer/:path_opening/:path_line",
-        element: <TrainerView allLines={allLines} />,
+        path: "/trainer/:id/:variation_id",
+        element: <TrainerBoardView allLines={allLines} />,
     },
 ]);
 

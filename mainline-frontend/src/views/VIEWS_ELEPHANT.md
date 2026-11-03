@@ -16,7 +16,9 @@ src/views/
 ├── StudyViewCatalog.jsx        # Opening repertoire list (/study) with real-time search
 ├── StudyViewLineCatalog.jsx    # Specific opening variations list (/study/:path_opening)
 ├── StudyViewBoard.jsx          # Interactive board view (/study/:path_opening/:path_line)
-└── TrainerView.jsx             # Repertoire drill arena (/trainer)
+├── TrainerCatalogView.jsx      # Line selection view (/trainer)
+├── TrainerBoardView.jsx        # Interactive drill board view (/trainer/:id, /trainer/:id/:variation_id)
+└── TrainerView.jsx             # Re-exports TrainerCatalogView & TrainerBoardView
 ```
 
 ```
@@ -26,6 +28,8 @@ Route Hierarchy:
 │   └── /study/:path_opening
 │       └── /study/:path_opening/:path_line
 └── /trainer
+    ├── /trainer/:id
+    └── /trainer/:id/:variation_id
 ```
 
 ---
@@ -77,8 +81,24 @@ Route Hierarchy:
   - Calls `line.getEvaluationStack()` to retrieve per-ply evaluation scores.
   - Synchronizes `Board`, `BoardControl`, `BoardNotation`, `BoardEvaluation`, and `BoardTitle` based on `solutionBoardIndex`.
 
-### 5. `TrainerView.jsx` (Route: `/trainer`)
-- **Purpose**: Dedicated practice arena where players select an opening to drill.
+### 5. `TrainerCatalogView.jsx` (Route: `/trainer`)
+- **Purpose**: Line selection arena for trainer mode.
 - **Features**:
-  - Repertoire Sparring banner with cyan `BoltIcon`.
-  - Drill cards for each available repertoire with one-click jump into the study sequence.
+  - Quick Sparring card for "Random Repertoire Drill" across all openings (`/trainer/random`).
+  - Search bar filtering by opening name, variation label, deviation move, or move sequence.
+  - Horizontal opening filter chips (All Openings + 14 individual opening chips with counts).
+  - Variation cards displaying opening name, green variation tag, blue deviation tag, move preview, and "Train Line →" button.
+  - Clicking any card navigates to `/trainer/:id` or `/trainer/:id/:variation_id`.
+  - Top-left back arrow returns to home (`/`).
+
+### 6. `TrainerBoardView.jsx` (Route: `/trainer/:id`, `/trainer/:id/:variation_id`)
+- **Purpose**: Interactive opening sparring board with automated opponent moves and real-time validation.
+- **Features**:
+  - Top-left back arrow returns to line selection (`/trainer`).
+  - Base `<Board>` component with interactive move input.
+  - Color side selection: ⚪ White, ⚫ Black, or 🔀 Random.
+  - Automatic opponent replies played with natural delay and move audio.
+  - Strict line validation with immediate feedback (correct chimes vs. wrong move shake and explanation).
+  - Stockfish engine evaluation bar via `BoardEvaluation`.
+  - Repertoire moves history strip and hints.
+  - Variation mastery celebration with streak and completion counters.

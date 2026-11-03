@@ -846,6 +846,52 @@ code {
   justify-content: center;
 }
 
+.trainer-hero-cta-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Horizontal scrolling chips for trainer line selection */
+.trainer-chips-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 14px 4px 14px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.trainer-chips-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.trainer-chip-btn {
+  white-space: nowrap;
+  background: #1C2029;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9CA3AF;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.trainer-chip-btn:hover {
+  background: #252B38;
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.trainer-chip-btn.active {
+  background: rgba(35, 181, 239, 0.18);
+  border-color: #23B5EF;
+  color: #23B5EF;
+  font-weight: 700;
+}
+
 /* ==========================================================================
    Interactive Opening Trainer UI
    ========================================================================== */
