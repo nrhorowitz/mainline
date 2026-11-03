@@ -90,12 +90,22 @@ export const Board = forwardRef((props, ref) => {
         }
       }));
 
+    var boardData = props.board;
+    if (props.orientation === BoardOrientation.REVERSED) {
+        boardData = flipBoard(props.board);
+    }
+
+    var validMoves = new Set();
+    if (selected !== -1) {
+        validMoves = getValidMoves(boardData, selected, props.boardTurn, props.orientation, props.additionalValidMoves);
+    }
+
     const setSelectedCallback = (selectedValue) => {
         if (!props.isCurrentBoard) {
             return;
         }
-        const selectedPiece = getPiece(props.board, selected);
-        const selectedValuePiece = getPiece(props.board, selectedValue);
+        const selectedPiece = getPiece(boardData, selected);
+        const selectedValuePiece = getPiece(boardData, selectedValue);
         if (selected === -1) {
             if (isPlayerPiece(selectedValuePiece, props.boardTurn)) {
                 setSelected(selectedValue);
@@ -113,28 +123,27 @@ export const Board = forwardRef((props, ref) => {
             }
         }
     }
-    var boardData = props.board;
-    if (props.orientation === BoardOrientation.REVERSED) {
-        boardData = flipBoard(props.board)
-    }
-
-    var validMoves = new Set();
-    if (selected !== -1) {
-        validMoves = getValidMoves(boardData, selected, props.boardTurn);
-    }
 
     const previousMoves = [];
-    if (props.currentBoardNotation !== null) {
-        previousMoves.push(
-            [
-                numberMapComplement[props.currentBoardNotation.rankDestination],
-                letterMapComplement[props.currentBoardNotation.fileDestination]
-            ]);
-        previousMoves.push(
-            [
-                numberMapComplement[props.currentBoardNotation.rankOrigin],
-                letterMapComplement[props.currentBoardNotation.fileOrigin]
-            ]);
+    if (props.currentBoardNotation !== null && props.currentBoardNotation !== undefined) {
+        const destRow = numberMapComplement[String(props.currentBoardNotation.rankDestination)];
+        const destCol = letterMapComplement[props.currentBoardNotation.fileDestination];
+        const origRow = numberMapComplement[String(props.currentBoardNotation.rankOrigin)];
+        const origCol = letterMapComplement[props.currentBoardNotation.fileOrigin];
+        if (destRow !== undefined && destCol !== undefined) {
+            if (props.orientation === BoardOrientation.REVERSED) {
+                previousMoves.push([7 - destRow, 7 - destCol]);
+            } else {
+                previousMoves.push([destRow, destCol]);
+            }
+        }
+        if (origRow !== undefined && origCol !== undefined) {
+            if (props.orientation === BoardOrientation.REVERSED) {
+                previousMoves.push([7 - origRow, 7 - origCol]);
+            } else {
+                previousMoves.push([origRow, origCol]);
+            }
+        }
     }
 
     return <div className="board">

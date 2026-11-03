@@ -32,6 +32,14 @@ const router = createBrowserRouter([
         path: "/trainer",
         element: <TrainerView allLines={allLines} />,
     },
+    {
+        path: "/trainer/:path_opening",
+        element: <TrainerView allLines={allLines} />,
+    },
+    {
+        path: "/trainer/:path_opening/:path_line",
+        element: <TrainerView allLines={allLines} />,
+    },
 ]);
 
 export function Router() {

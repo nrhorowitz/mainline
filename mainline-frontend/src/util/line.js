@@ -146,7 +146,7 @@ function applyMove(board, notation, boardTurn) {
         if (boardTurn === BoardTurn.WHITE) {
             movedPiece = Piece.WKING;
             destinationRank = '1';
-            destinationFile = 'c';
+            destinationFile = 'g';
             originRank = '1';
             originFile = 'e';
             newBoard[7][7] = Piece.DEFAULT;
@@ -156,7 +156,7 @@ function applyMove(board, notation, boardTurn) {
         } else {
             movedPiece = Piece.BKING;
             destinationRank = '8';
-            destinationFile = 'c';
+            destinationFile = 'g';
             originRank = '8';
             originFile = 'e';
             newBoard[0][7] = Piece.DEFAULT;

@@ -89,37 +89,62 @@ function computeValidMoves(board, selected, moves, storeValidMoves, condition, b
 
 const KNIGHT_MOVES = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
 
-export function getValidMoves(board, selected, boardTurn) {
+export function getValidMoves(board, selected, boardTurn, orientation = BoardOrientation.DEFAULT, additionalMoves = []) {
     let piece = getPiece(board, selected);
     let rowAndCol = getRowAndCol(selected);
     let r = rowAndCol[0];
     let c = rowAndCol[1];
     
     let validMoves = [];
-    if (piece === Piece.WPAWN) {
-        computeValidMoves(board, selected, [[-1, 0]], validMoves, Condition.OPEN, boardTurn)
+
+    const isMovingUp = (piece === Piece.WPAWN && orientation === BoardOrientation.DEFAULT) ||
+                       (piece === Piece.BPAWN && orientation === BoardOrientation.REVERSED);
+    const isMovingDown = (piece === Piece.BPAWN && orientation === BoardOrientation.DEFAULT) ||
+                         (piece === Piece.WPAWN && orientation === BoardOrientation.REVERSED);
+
+    if (isMovingUp) {
+        computeValidMoves(board, selected, [[-1, 0]], validMoves, Condition.OPEN, boardTurn);
         if (r === 6) {
             if ((getPiece(board, r - 1, c) === Piece.DEFAULT) && (getPiece(board, r - 2, c) === Piece.DEFAULT)) {
                 validMoves.push(computeSelected(r - 2, c));
             }
         }
         computeValidMoves(board, selected, [[-1, -1], [-1, 1]], validMoves, Condition.OPPONENT, boardTurn);
-    } else if ((piece === Piece.WKNIGHT) || (piece === Piece.BKNIGHT)) {
-        computeValidMoves(board, selected, KNIGHT_MOVES, validMoves, Condition.OPEN_OR_OPPONENT, boardTurn);
-    } else if ((piece === Piece.WBISHOP) || (piece === Piece.BBISHOP)
-        || (piece === Piece.WROOK) || (piece === Piece.BROOK)
-        || (piece === Piece.WQUEEN) || (piece === Piece.BQUEEN)
-        || (piece === Piece.WKING) || (piece === Piece.BKING)) {
-        const currentPossibleMoves = computePossibleMoves(board, piece, r, c, boardTurn);
-        computeValidMoves(board, selected, currentPossibleMoves, validMoves, Condition.OPEN_OR_OPPONENT, boardTurn);
-    } else if (piece === Piece.BPAWN) {
-        computeValidMoves(board, selected, [[1, 0]], validMoves, Condition.OPEN, boardTurn)
+    } else if (isMovingDown) {
+        computeValidMoves(board, selected, [[1, 0]], validMoves, Condition.OPEN, boardTurn);
         if (r === 1) {
             if ((getPiece(board, r + 1, c) === Piece.DEFAULT) && (getPiece(board, r + 2, c) === Piece.DEFAULT)) {
                 validMoves.push(computeSelected(r + 2, c));
             }
         }
         computeValidMoves(board, selected, [[1, -1], [1, 1]], validMoves, Condition.OPPONENT, boardTurn);
+    } else if ((piece === Piece.WKNIGHT) || (piece === Piece.BKNIGHT)) {
+        computeValidMoves(board, selected, KNIGHT_MOVES, validMoves, Condition.OPEN_OR_OPPONENT, boardTurn);
+    } else if ((piece === Piece.WBISHOP) || (piece === Piece.BBISHOP)
+        || (piece === Piece.WROOK) || (piece === Piece.BROOK)
+        || (piece === Piece.WQUEEN) || (piece === Piece.BQUEEN)) {
+        const currentPossibleMoves = computePossibleMoves(board, piece, r, c, boardTurn);
+        computeValidMoves(board, selected, currentPossibleMoves, validMoves, Condition.OPEN_OR_OPPONENT, boardTurn);
+    } else if ((piece === Piece.WKING) || (piece === Piece.BKING)) {
+        const currentPossibleMoves = computePossibleMoves(board, piece, r, c, boardTurn);
+        computeValidMoves(board, selected, currentPossibleMoves, validMoves, Condition.OPEN_OR_OPPONENT, boardTurn);
+        // Castling moves (2 squares to the right or left if path is clear)
+        if (inBounds(r, c + 1) && inBounds(r, c + 2) &&
+            getPiece(board, r, c + 1) === Piece.DEFAULT &&
+            getPiece(board, r, c + 2) === Piece.DEFAULT) {
+            validMoves.push(computeSelected(r, c + 2));
+        }
+        if (inBounds(r, c - 1) && inBounds(r, c - 2) &&
+            getPiece(board, r, c - 1) === Piece.DEFAULT &&
+            getPiece(board, r, c - 2) === Piece.DEFAULT) {
+            validMoves.push(computeSelected(r, c - 2));
+        }
+    }
+
+    if (additionalMoves && additionalMoves.length > 0) {
+        for (let i = 0; i < additionalMoves.length; i += 1) {
+            validMoves.push(additionalMoves[i]);
+        }
     }
 
     let filteredValidMoves = [];
