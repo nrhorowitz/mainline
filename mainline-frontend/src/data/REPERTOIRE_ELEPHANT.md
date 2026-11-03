@@ -12,7 +12,8 @@ Opening repertoire datasets are stored as structured JSON documents under `src/d
 src/data/
 ├── REPERTOIRE_ELEPHANT.md      # Repertoire documentation (This file)
 ├── catalan.json                # Catalan Opening (1. d4 Nf6 2. c4 e6 3. g3...)
-└── carokann.json               # Caro-Kann Defence (1. e4 c6 2. d4 d5...)
+├── carokann.json               # Caro-Kann Defence (1. e4 c6 2. d4 d5...)
+└── sicilian.json               # Sicilian Defence (1. e4 c5 2. Nf3 Nc6 3. Bb5...)
 ```
 
 ---

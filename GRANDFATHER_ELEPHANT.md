@@ -56,10 +56,15 @@ Master architectural overview, system vision, directory inventory, multi-environ
 ```
 Mainline/
 ├── GRANDFATHER_ELEPHANT.md                 # Master system overview & architecture (This file)
-├── package.json                            # Root convenience scripts (start, dev, build)
+├── package.json                            # Root convenience scripts (start, dev, build, generate:line)
 ├── firebase.json                           # Firebase hosting rules & SPA URL rewrites
 ├── .firebaserc                             # Firebase project binding (mainline-chess)
 ├── .gitignore                              # Git exclusion rules
+├── services/
+│   └── engine/
+│       ├── ENGINE_ELEPHANT.md              # Repertoire engine documentation & API protocol
+│       ├── generate_line.py                # Standalone Lichess API opening line generator
+│       └── requirements.txt                # Python dependencies (python-chess)
 └── mainline-frontend/
     ├── FRONTEND_ELEPHANT.md                # Master frontend architecture & Vite config
     ├── package.json                        # Frontend dependencies & scripts
@@ -79,7 +84,8 @@ Mainline/
         ├── data/
         │   ├── REPERTOIRE_ELEPHANT.md      # Repertoire schemas & line definitions
         │   ├── catalan.json                # Catalan opening data & variations
-        │   └── carokann.json               # Caro-Kann opening data & variations
+        │   ├── carokann.json               # Caro-Kann opening data & variations
+        │   └── sicilian.json               # Sicilian opening data (Lichess engine generated)
         ├── components/
         │   └── board/
         │       ├── BOARD_ELEPHANT.md       # Chessboard component documentation

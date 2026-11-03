@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "npm --prefix mainline-frontend run dev",
     "start": "npm --prefix mainline-frontend start",
-    "build": "npm --prefix mainline-frontend run build"
+    "build": "npm --prefix mainline-frontend run build",
+    "generate:line": "python3 services/engine/generate_line.py"
   }
 }
 

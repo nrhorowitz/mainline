@@ -2,6 +2,7 @@ import { Piece, BoardTurn, StartingBoard, numberMapComplement, letterMapCompleme
 import { toggleBoardTurn, copyBoard, inBounds, nameToKey } from './util';
 import Catalan from '../data/catalan.json';
 import CaroKann from '../data/carokann.json';
+import Sicilian from '../data/sicilian.json';
 
 var linesData = {}
 
@@ -186,6 +187,19 @@ function applyMove(board, notation, boardTurn) {
     if (move.includes('x')) {
         if (move.length === 5) {
             fileHint = move[1];
+            let fileHintColumn = letterMapComplement[fileHint];
+            if (pieceCharacter === 'N') {
+                piece = (boardTurn === BoardTurn.WHITE) ? Piece.WKNIGHT : Piece.BKNIGHT;
+            } else if (pieceCharacter === 'B') {
+                piece = (boardTurn === BoardTurn.WHITE) ? Piece.WBISHOP : Piece.BBISHOP;
+            } else if (pieceCharacter === 'R') {
+                piece = (boardTurn === BoardTurn.WHITE) ? Piece.WROOK : Piece.BROOK;
+            } else if (pieceCharacter === 'Q') {
+                piece = (boardTurn === BoardTurn.WHITE) ? Piece.WQUEEN : Piece.BQUEEN;
+            } else if (pieceCharacter === 'K') {
+                piece = (boardTurn === BoardTurn.WHITE) ? Piece.WKING : Piece.BKING;
+            }
+            origin = getOrigin(board, piece, true, destinationRow, destinationColumn, fileHintColumn);
         } else if (move.length === 4) {
             if (pieceCharacter === pieceCharacter.toLowerCase()) {
                 piece = (boardTurn === BoardTurn.WHITE) ? Piece.WPAWN : Piece.BPAWN;
@@ -319,7 +333,7 @@ export class Opening {
 }
 
 export function loadAllLines() {
-    const jsons = [Catalan, CaroKann]; // TODO all jsons
+    const jsons = [Catalan, CaroKann, Sicilian]; // TODO all jsons
     const allLines = {}
     for (let i = 0; i < jsons.length; i += 1) {
         let opening_json = jsons[i];
