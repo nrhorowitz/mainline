@@ -5,6 +5,8 @@ import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -268,29 +270,53 @@ export function TrainerBoardView(props) {
         };
     }, [id, variation_id, resolveOpeningAndLine]);
 
-    // Change Color choice handler
-    const handleColorChoiceChange = (newColor) => {
-        setColorChoice(newColor);
-        if (activeOpeningKey && activeLineKey) {
-            setupDrill(activeOpeningKey, activeLineKey, newColor);
-        }
+    // Options Modal state
+    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+    const [modalColorChoice, setModalColorChoice] = useState('white');
+    const [modalOpeningKey, setModalOpeningKey] = useState('');
+    const [modalLineKey, setModalLineKey] = useState('');
+
+    const openOptionsModal = () => {
+        setModalColorChoice(colorChoice);
+        setModalOpeningKey(activeOpeningKey || '');
+        setModalLineKey(activeLineKey || '');
+        setIsOptionsOpen(true);
     };
 
-    // Change Opening handler
-    const handleOpeningChange = (newOpKey) => {
-        const op = allLines[newOpKey];
+    const closeOptionsModal = () => {
+        setIsOptionsOpen(false);
+    };
+
+    const handleModalOpeningChange = (newOp) => {
+        setModalOpeningKey(newOp);
+        const op = allLines[newOp];
         if (op && op.lines) {
             const firstLineKey = Object.keys(op.lines)[0];
-            navigate(`/trainer/${newOpKey}/${firstLineKey}`);
+            setModalLineKey(firstLineKey);
         }
     };
 
-    // Change Variation handler
-    const handleVariationChange = (newLineKey) => {
-        if (activeOpeningKey) {
-            navigate(`/trainer/${activeOpeningKey}/${newLineKey}`);
+    const handleSaveOptions = () => {
+        setIsOptionsOpen(false);
+        setColorChoice(modalColorChoice);
+        if (modalOpeningKey && modalLineKey) {
+            if (modalOpeningKey !== activeOpeningKey || modalLineKey !== activeLineKey) {
+                navigate(`/trainer/${modalOpeningKey}/${modalLineKey}`);
+            } else {
+                setupDrill(modalOpeningKey, modalLineKey, modalColorChoice);
+            }
         }
     };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && isOptionsOpen) {
+                setIsOptionsOpen(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOptionsOpen]);
 
     // Reset current line
     const handleRestartLine = () => {
@@ -501,72 +527,125 @@ export function TrainerBoardView(props) {
                         <span style={{ fontSize: '13px' }}>🔥</span>
                         <span>{streak}</span>
                     </span>
+                    <IconButton
+                        size="small"
+                        onClick={openOptionsModal}
+                        title="Trainer Settings"
+                        sx={{
+                            color: '#BABABA',
+                            backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                            padding: '6px',
+                            marginLeft: '2px',
+                            '&:hover': { backgroundColor: 'rgba(35, 181, 239, 0.2)', color: trainerIconColor }
+                        }}
+                    >
+                        <SettingsIcon sx={{ fontSize: 20 }} />
+                    </IconButton>
                 </div>
             </div>
 
-            {/* Drill Configuration Toolbar */}
-            <div className="trainer-toolbar-card">
-                {/* Side Selection: White / Black / Random */}
-                <div className="trainer-side-selector-group">
-                    <span className="trainer-control-label">SIDE:</span>
-                    <div className="trainer-side-pills">
-                        <button
-                            className={`trainer-side-btn ${colorChoice === 'white' ? 'active' : ''}`}
-                            onClick={() => handleColorChoiceChange('white')}
-                        >
-                            ⚪ White
-                        </button>
-                        <button
-                            className={`trainer-side-btn ${colorChoice === 'black' ? 'active' : ''}`}
-                            onClick={() => handleColorChoiceChange('black')}
-                        >
-                            ⚫ Black
-                        </button>
-                        <button
-                            className={`trainer-side-btn ${colorChoice === 'random' ? 'active' : ''}`}
-                            onClick={() => handleColorChoiceChange('random')}
-                        >
-                            🔀 Random
-                        </button>
+            {/* Trainer Options Modal */}
+            {isOptionsOpen && (
+                <div className="trainer-modal-overlay" onClick={closeOptionsModal}>
+                    <div className="trainer-modal-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="trainer-modal-header">
+                            <div className="trainer-modal-title">
+                                <SettingsIcon sx={{ fontSize: 20, color: trainerIconColor }} />
+                                <span>Trainer Options</span>
+                            </div>
+                            <IconButton
+                                size="small"
+                                onClick={closeOptionsModal}
+                                sx={{ color: '#BABABA', padding: '4px' }}
+                            >
+                                <CloseIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                        </div>
+
+                        <div className="trainer-modal-body">
+                            {/* Side Selection: White / Black / Random */}
+                            <div className="trainer-modal-field">
+                                <label className="trainer-modal-label">SIDE TO PLAY</label>
+                                <div className="trainer-side-pills">
+                                    <button
+                                        type="button"
+                                        className={`trainer-side-btn ${modalColorChoice === 'white' ? 'active' : ''}`}
+                                        onClick={() => setModalColorChoice('white')}
+                                    >
+                                        ⚪ White
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`trainer-side-btn ${modalColorChoice === 'black' ? 'active' : ''}`}
+                                        onClick={() => setModalColorChoice('black')}
+                                    >
+                                        ⚫ Black
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`trainer-side-btn ${modalColorChoice === 'random' ? 'active' : ''}`}
+                                        onClick={() => setModalColorChoice('random')}
+                                    >
+                                        🔀 Random
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Opening Select */}
+                            <div className="trainer-modal-field">
+                                <label className="trainer-modal-label">OPENING</label>
+                                <select
+                                    className="trainer-dropdown"
+                                    value={modalOpeningKey}
+                                    onChange={(e) => handleModalOpeningChange(e.target.value)}
+                                >
+                                    {openingKeys.map(k => (
+                                        <option key={k} value={k}>
+                                            {allLines[k].opening_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Variation Select */}
+                            <div className="trainer-modal-field">
+                                <label className="trainer-modal-label">VARIATION</label>
+                                <select
+                                    className="trainer-dropdown"
+                                    value={modalLineKey}
+                                    onChange={(e) => setModalLineKey(e.target.value)}
+                                >
+                                    {modalOpeningKey && allLines[modalOpeningKey] && Object.keys(allLines[modalOpeningKey].lines).map(lk => {
+                                        const l = allLines[modalOpeningKey].lines[lk];
+                                        return (
+                                            <option key={lk} value={lk}>
+                                                {l.label || l.line_name}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="trainer-modal-footer">
+                            <button
+                                type="button"
+                                className="trainer-modal-cancel-btn"
+                                onClick={closeOptionsModal}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="trainer-modal-save-btn"
+                                onClick={handleSaveOptions}
+                            >
+                                Save Options
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                {/* Dropdowns for Opening & Variation */}
-                <div className="trainer-selectors-row">
-                    <div className="trainer-select-wrap">
-                        <label className="trainer-select-label">OPENING</label>
-                        <select
-                            className="trainer-dropdown"
-                            value={activeOpeningKey || ''}
-                            onChange={(e) => handleOpeningChange(e.target.value)}
-                        >
-                            {openingKeys.map(k => (
-                                <option key={k} value={k}>
-                                    {allLines[k].opening_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="trainer-select-wrap">
-                        <label className="trainer-select-label">VARIATION</label>
-                        <select
-                            className="trainer-dropdown"
-                            value={activeLineKey || ''}
-                            onChange={(e) => handleVariationChange(e.target.value)}
-                        >
-                            {activeOpening && Object.keys(activeOpening.lines).map(lk => {
-                                const l = activeOpening.lines[lk];
-                                return (
-                                    <option key={lk} value={lk}>
-                                        {l.label || l.line_name}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </div>
-                </div>
-            </div>
+            )}
 
             {/* Board Title Header */}
             {activeOpening && activeLine && (
@@ -709,3 +788,4 @@ export function TrainerBoardView(props) {
         </div>
     );
 }
+

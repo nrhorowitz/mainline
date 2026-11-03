@@ -1307,3 +1307,127 @@ code {
   color: #525868;
 }
 
+/* ==========================================================================
+   Trainer Options Modal
+   ========================================================================== */
+.trainer-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modal-overlay-in 0.15s ease-out;
+}
+
+.trainer-modal-card {
+  background: #171A21;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  padding: 18px 20px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: modal-card-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-card-in {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.trainer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.trainer-modal-title {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trainer-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.trainer-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trainer-modal-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: #7A8090;
+}
+
+.trainer-modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.trainer-modal-cancel-btn {
+  flex: 1;
+  padding: 10px 14px;
+  background: #20242E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #A0A5B5;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.trainer-modal-cancel-btn:hover {
+  background: #282D3A;
+  color: #FFFFFF;
+}
+
+.trainer-modal-save-btn {
+  flex: 1.2;
+  padding: 10px 14px;
+  background: #23B5EF;
+  border: none;
+  border-radius: 8px;
+  color: #1E1E1E;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.trainer-modal-save-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+

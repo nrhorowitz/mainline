@@ -263,3 +263,4 @@ export function TrainerCatalogView(props) {
         </div>
     );
 }
+
