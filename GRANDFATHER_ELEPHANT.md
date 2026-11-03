@@ -56,7 +56,7 @@ Master architectural overview, system vision, directory inventory, multi-environ
 ```
 Mainline/
 ├── GRANDFATHER_ELEPHANT.md                 # Master system overview & architecture (This file)
-├── package.json                            # Root convenience scripts (start, dev, build, generate:line)
+├── package.json                            # Root convenience scripts (start, dev, build, deploy, generate:all)
 ├── firebase.json                           # Firebase hosting rules & SPA URL rewrites
 ├── .firebaserc                             # Firebase project binding (mainline-chess)
 ├── .gitignore                              # Git exclusion rules
@@ -64,6 +64,8 @@ Mainline/
 │   └── engine/
 │       ├── ENGINE_ELEPHANT.md              # Repertoire engine documentation & API protocol
 │       ├── generate_line.py                # Standalone Lichess API opening line generator
+│       ├── generate_all_openings.py        # Automated batch generator for canonical variations
+│       ├── generate_master_repertoire.py   # Full 14-opening master repertoire generator
 │       └── requirements.txt                # Python dependencies (python-chess)
 └── mainline-frontend/
     ├── FRONTEND_ELEPHANT.md                # Master frontend architecture & Vite config
@@ -82,10 +84,21 @@ Mainline/
         ├── index.css                       # Global CSS resets, board grid, coordinates, and controls
         ├── reportWebVitals.js              # Performance metric collection
         ├── data/
-        │   ├── REPERTOIRE_ELEPHANT.md      # Repertoire schemas & line definitions
+        │   ├── REPERTOIRE_ELEPHANT.md      # Repertoire schemas & line definitions (14 openings, 69 lines, 2459 plies)
         │   ├── catalan.json                # Catalan opening data & variations
         │   ├── carokann.json               # Caro-Kann opening data & variations
-        │   └── sicilian.json               # Sicilian opening data (Lichess engine generated)
+        │   ├── sicilian.json               # Sicilian opening data & variations
+        │   ├── ruylopez.json               # Ruy Lopez opening data & variations
+        │   ├── french.json                 # French Defense data & variations
+        │   ├── italian.json                # Italian Game data & variations
+        │   ├── qgd.json                    # Queen's Gambit Declined data & variations
+        │   ├── kingsindian.json            # King's Indian Defense data & variations
+        │   ├── nimzoindian.json            # Nimzo-Indian Defense data & variations
+        │   ├── london.json                 # London System data & variations
+        │   ├── english.json                # English Opening data & variations
+        │   ├── scandinavian.json           # Scandinavian Defense data & variations
+        │   ├── grunfeld.json               # Grünfeld Defense data & variations
+        │   └── slav.json                   # Slav Defense data & variations
         ├── components/
         │   └── board/
         │       ├── BOARD_ELEPHANT.md       # Chessboard component documentation

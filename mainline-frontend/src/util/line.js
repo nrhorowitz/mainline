@@ -3,6 +3,17 @@ import { toggleBoardTurn, copyBoard, inBounds, nameToKey } from './util';
 import Catalan from '../data/catalan.json';
 import CaroKann from '../data/carokann.json';
 import Sicilian from '../data/sicilian.json';
+import RuyLopez from '../data/ruylopez.json';
+import French from '../data/french.json';
+import Italian from '../data/italian.json';
+import QGD from '../data/qgd.json';
+import KingsIndian from '../data/kingsindian.json';
+import NimzoIndian from '../data/nimzoindian.json';
+import London from '../data/london.json';
+import English from '../data/english.json';
+import Scandinavian from '../data/scandinavian.json';
+import Grunfeld from '../data/grunfeld.json';
+import Slav from '../data/slav.json';
 
 var linesData = {}
 
@@ -393,7 +404,28 @@ export class Opening {
 }
 
 export function loadAllLines() {
-    const jsons = [Catalan, CaroKann, Sicilian]; // TODO all jsons
+    let jsons = [];
+    try {
+        if (typeof import.meta !== 'undefined' && import.meta.glob) {
+            const modules = import.meta.glob('../data/*.json', { eager: true });
+            for (const path in modules) {
+                const mod = modules[path];
+                const data = (mod && mod.default) ? mod.default : mod;
+                if (data && data.opening && data.lines) {
+                    jsons.push(data);
+                }
+            }
+        }
+    } catch (e) {
+        // Fallback
+    }
+    if (jsons.length === 0) {
+        jsons = [
+            Catalan, CaroKann, Sicilian, RuyLopez, French,
+            Italian, QGD, KingsIndian, NimzoIndian, London,
+            English, Scandinavian, Grunfeld, Slav
+        ];
+    }
     const allLines = {}
     for (let i = 0; i < jsons.length; i += 1) {
         let opening_json = jsons[i];

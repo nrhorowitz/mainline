@@ -63,9 +63,12 @@ export function LandingView(props) {
                             Explore canonical opening lines move-by-move with Stockfish evaluations and branching catalogs.
                         </div>
                         <div className="landing-card-pill-row">
-                            {openingPills.map((name) => (
+                            {openingPills.slice(0, 6).map((name) => (
                                 <span key={name} className="landing-pill">{name}</span>
                             ))}
+                            {openingPills.length > 6 && (
+                                <span className="landing-pill">+{openingPills.length - 6} More</span>
+                            )}
                             <span className="landing-pill">Full Lines</span>
                         </div>
                     </div>
@@ -107,14 +110,14 @@ export function LandingView(props) {
                         <div className="landing-stat-icon">
                             <MenuBookIcon sx={{ fontSize: 18, color: studyIconColor }} />
                         </div>
-                        <div className="landing-stat-value">{openingCount || 3}</div>
+                        <div className="landing-stat-value">{openingCount || 14}</div>
                         <div className="landing-stat-label">Openings</div>
                     </div>
                     <div className="landing-stat-box">
                         <div className="landing-stat-icon">
                             <AutoGraphIcon sx={{ fontSize: 18, color: '#F0D9B5' }} />
                         </div>
-                        <div className="landing-stat-value">{totalPlies || 157}</div>
+                        <div className="landing-stat-value">{totalPlies || 2459}</div>
                         <div className="landing-stat-label">Total Plies</div>
                     </div>
                     <div className="landing-stat-box">

@@ -11,10 +11,23 @@ Opening repertoire datasets are stored as structured JSON documents under `src/d
 ```
 src/data/
 ├── REPERTOIRE_ELEPHANT.md      # Repertoire documentation (This file)
-├── catalan.json                # Catalan Opening (1. d4 Nf6 2. c4 e6 3. g3...)
-├── carokann.json               # Caro-Kann Defence (1. e4 c6 2. d4 d5...)
-└── sicilian.json               # Sicilian Defence (1. e4 c5 2. Nf3 Nc6 3. Bb5...)
+├── catalan.json                # Catalan Opening (5 variations, 164 plies)
+├── carokann.json               # Caro-Kann Defense (5 variations, 171 plies)
+├── sicilian.json               # Sicilian Defense (7 variations, 252 plies)
+├── ruylopez.json               # Ruy Lopez / Spanish (6 variations, 216 plies)
+├── french.json                 # French Defense (6 variations, 216 plies)
+├── italian.json                # Italian Game (5 variations, 180 plies)
+├── qgd.json                    # Queen's Gambit Declined (5 variations, 180 plies)
+├── kingsindian.json            # King's Indian Defense (5 variations, 180 plies)
+├── nimzoindian.json            # Nimzo-Indian Defense (5 variations, 180 plies)
+├── london.json                 # London System (4 variations, 144 plies)
+├── english.json                # English Opening (4 variations, 144 plies)
+├── scandinavian.json           # Scandinavian Defense (4 variations, 144 plies)
+├── grunfeld.json               # Grünfeld Defense (4 variations, 144 plies)
+└── slav.json                   # Slav Defense (4 variations, 144 plies)
 ```
+
+**Total Scope**: 14 Openings • 69 Canonical Variations • 2,459 Total Plies (each ~18 moves / 36 plies long with deep Stockfish cloud evaluations).
 
 ---
 
