@@ -1,0 +1,11 @@
+{
+  "name": "mainline",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix mainline-frontend run dev",
+    "start": "npm --prefix mainline-frontend start",
+    "build": "npm --prefix mainline-frontend run build"
+  }
+}
+

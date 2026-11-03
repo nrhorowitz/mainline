@@ -1,0 +1,136 @@
+/* ==========================================================================
+   Mobile Phone Cutout & Layout System
+   ========================================================================== */
+
+/* Outer wrapper: centers the phone on large displays with ambient dark background */
+.phone-viewport-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 20%, #1c2027 0%, #0c0d10 100%);
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+/* Phone physical frame (mocking a modern smartphone chassis) */
+.phone-device-frame {
+  position: relative;
+  width: 100%;
+  max-width: 414px;
+  height: min(870px, 94vh);
+  background: #121212;
+  border-radius: 48px;
+  border: 11px solid #23252a;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 22px 60px rgba(0, 0, 0, 0.75),
+    0 0 40px rgba(0, 172, 141, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Dynamic Island / Hardware notch */
+.phone-hardware-notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 25px;
+  background: #000000;
+  border-radius: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  box-sizing: border-box;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.phone-hardware-camera {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #111422;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Bottom home bar indicator */
+.phone-home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Phone screen content area */
+.phone-screen-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #121212;
+  position: relative;
+  padding-top: 36px;
+  padding-bottom: 22px;
+  box-sizing: border-box;
+  container-type: inline-size;
+  scrollbar-width: thin;
+  scrollbar-color: #333333 transparent;
+}
+
+.phone-screen-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.phone-screen-container::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   Responsive Mode: True Mobile Screens
+   ========================================================================== */
+@media (max-width: 500px), (max-height: 650px) {
+  .phone-viewport-wrapper {
+    padding: 0;
+    background: #121212;
+    min-height: 100%;
+    height: 100%;
+  }
+
+  .phone-device-frame {
+    max-width: 100%;
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .phone-hardware-notch,
+  .phone-home-indicator {
+    display: none;
+  }
+
+  .phone-screen-container {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
